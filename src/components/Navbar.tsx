@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { Briefcase, UserPlus, Home, BarChart3, LogIn, LogOut, User, ArrowRightLeft, Award } from 'lucide-react';
+import { Briefcase, UserPlus, Home, BarChart3, LogIn, LogOut, User, ArrowRightLeft, Award, Calendar } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
@@ -50,9 +50,13 @@ export default function Navbar() {
           <Award size={20} />
           <span className="text-xs font-medium">Talentos</span>
         </Link>
+        <Link href="/agenda" className="flex flex-col items-center gap-1 text-slate-500 hover:text-accent transition-colors">
+          <Calendar size={20} />
+          <span className="text-xs font-medium">Agenda</span>
+        </Link>
         <Link href="/ranking" className="flex flex-col items-center gap-1 text-slate-500 hover:text-accent transition-colors">
           <BarChart3 size={20} />
-          <span className="text-xs font-medium">Ranking</span>
+          <span className="text-xs font-medium">Selección</span>
         </Link>
         {user ? (
           <Link href="/profile" className="flex flex-col items-center gap-1 text-slate-500 hover:text-accent transition-colors">

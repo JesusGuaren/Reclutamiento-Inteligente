@@ -16,6 +16,12 @@ export default function NewJobPage() {
   const [nivel, setNivel] = useState("Junior");
   const [expMin, setExpMin] = useState(0);
   const [eduMin, setEduMin] = useState("Universitario");
+  const [pesos, setPesos] = useState({
+    habilidades: 40,
+    experiencia: 30,
+    educacion: 20,
+    extras: 10
+  });
 
   const addSkill = () => {
     if (skillInput && !skills.includes(skillInput)) {
@@ -43,7 +49,12 @@ export default function NewJobPage() {
           experiencia_min: expMin, 
           educacion_min: eduMin,
           estado: 'activa',
-          pesos: { habilidades: 0.4, experiencia: 0.3, educacion: 0.2, extras: 0.1 }
+          pesos: {
+            habilidades: pesos.habilidades / 100,
+            experiencia: pesos.experiencia / 100,
+            educacion: pesos.educacion / 100,
+            extras: pesos.extras / 100
+          }
         }
       ]);
 
@@ -159,6 +170,36 @@ export default function NewJobPage() {
                 </span>
               ))}
             </div>
+          </div>
+
+          <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Pesos de Evaluación (%)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[
+                { id: 'habilidades', label: 'Habilidades', color: 'bg-blue-500' },
+                { id: 'experiencia', label: 'Experiencia', color: 'bg-emerald-500' },
+                { id: 'educacion', label: 'Educación', color: 'bg-amber-500' },
+                { id: 'extras', label: 'Extras/Otros', color: 'bg-purple-500' },
+              ].map((item) => (
+                <div key={item.id} className="space-y-2">
+                  <div className="flex justify-between text-xs font-bold">
+                    <span>{item.label}</span>
+                    <span>{pesos[item.id as keyof typeof pesos]}%</span>
+                  </div>
+                  <input 
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={pesos[item.id as keyof typeof pesos]}
+                    onChange={(e) => setPesos({ ...pesos, [item.id]: parseInt(e.target.value) })}
+                    className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-slate-200 dark:bg-slate-800 accent-slate-900 dark:accent-slate-100`}
+                  />
+                </div>
+              ))}
+            </div>
+            <p className="text-[10px] text-slate-400 italic">
+              * El sistema normalizará los pesos automáticamente si no suman 100%.
+            </p>
           </div>
         </div>
 

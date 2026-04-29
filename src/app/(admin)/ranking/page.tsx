@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { Trophy, AlertCircle, ChevronRight, Info, Search, GitCompare, X } from 'lucide-react';
+import { Trophy, AlertCircle, ChevronRight, Info, Search, GitCompare, X, CheckCircle, Calendar, Trash2, Star, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Application } from '@/types';
+import { evaluateCandidate } from '@/lib/evaluator';
 
 export default function RankingPage() {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -12,10 +13,20 @@ export default function RankingPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [compareList, setCompareList] = useState<Application[]>([]);
   const [minScore, setMinScore] = useState(0);
+  const [interviewDate, setInterviewDate] = useState("");
 
   useEffect(() => {
     fetchApplications();
+    // Limpieza automática de estados antiguos para que no digan "Entrevistado" a secas
+    cleanupOldStatuses();
   }, []);
+
+  async function cleanupOldStatuses() {
+    await supabase
+      .from('applications')
+      .update({ estado: 'entrevista_pendiente' })
+      .eq('estado', 'entrevistado');
+  }
 
   async function fetchApplications() {
     setLoading(true);
@@ -32,6 +43,20 @@ export default function RankingPage() {
       setApplications(data as any);
     }
     setLoading(false);
+  }
+
+  async function updateApplication(id: string, updates: Partial<Application>) {
+    const { error } = await supabase
+      .from('applications')
+      .update(updates)
+      .eq('id', id);
+    
+    if (!error) {
+      fetchApplications();
+      if (selectedEval && selectedEval.id === id) {
+        setSelectedEval({ ...selectedEval, ...updates });
+      }
+    }
   }
 
   const toggleCompare = (app: Application, e: React.MouseEvent) => {
@@ -83,7 +108,7 @@ export default function RankingPage() {
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="space-y-1">
-          <h1 className="text-3xl font-black">Ranking de Talentos</h1>
+          <h1 className="text-3xl font-black italic tracking-tighter">SELECCIÓN DE TALENTOS</h1>
           <button 
             onClick={downloadCSV}
             className="text-xs font-bold text-accent hover:underline flex items-center gap-1"
@@ -128,18 +153,28 @@ export default function RankingPage() {
             <div className="flex items-center gap-6">
               <div className={`
                 w-12 h-12 flex items-center justify-center rounded-2xl font-bold text-xl
-                ${index === 0 ? 'bg-yellow-400 text-white shadow-lg' : 
-                  index === 1 ? 'bg-slate-300 text-white' : 
-                  index === 2 ? 'bg-orange-400 text-white' : 'bg-slate-100 text-slate-400'}
+                ${app.estado === 'seleccionado' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 
+                  app.estado === 'entrevista_pendiente' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20' : 
+                  index === 0 ? 'bg-yellow-400 text-white shadow-lg' : 'bg-slate-100 text-slate-400'}
               `}>
-                {index === 0 ? <Trophy size={24} /> : index + 1}
+                {app.estado === 'seleccionado' ? <CheckCircle size={24} /> : 
+                 app.estado === 'entrevista_pendiente' ? <Calendar size={24} /> : 
+                 index === 0 ? <Trophy size={24} /> : index + 1}
               </div>
               
               <div className="flex-1">
                 <h3 className="text-lg font-bold group-hover:text-accent">{app.candidate?.nombre || "Candidato"}</h3>
                 <div className="flex items-center gap-2">
                   <span className="text-xs px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-slate-500">{app.job?.titulo || "Oferta"}</span>
-                  <span className="text-xs px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded">{app.job?.nivel || "Nivel"}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded font-bold uppercase ${
+                    app.estado === 'seleccionado' ? 'bg-emerald-100 text-emerald-600' :
+                    (app.estado === 'entrevista_pendiente' || app.estado === 'entrevista_realizada') ? 'bg-blue-100 text-blue-600' :
+                    'bg-slate-100 text-slate-500'
+                  }`}>
+                    {app.estado === 'entrevista_pendiente' ? 'Entrevista Pendiente' : 
+                     app.estado === 'entrevista_realizada' ? 'Entrevista Realizada' : 
+                     app.estado}
+                  </span>
                 </div>
               </div>
 
@@ -187,19 +222,92 @@ export default function RankingPage() {
                 ))}
               </div>
 
-              <div className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-100 dark:border-blue-800">
-                <p className="text-xs font-bold text-blue-600 mb-2 flex items-center gap-2 uppercase tracking-widest">
-                  <Info size={14} /> Análisis de Explicabilidad
-                </p>
-                <p className="text-sm text-slate-700 dark:text-slate-300 italic leading-relaxed">"{selectedEval.justificacion}"</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {(() => {
+                  // Si no hay fortalezas en la DB (datos antiguos), las calculamos al vuelo
+                  let forts = selectedEval.fortalezas || [];
+                  let debils = selectedEval.debilidades || [];
+                  
+                  if (forts.length === 0 && debils.length === 0 && selectedEval.job && selectedEval.candidate) {
+                    const evalResult = evaluateCandidate(selectedEval.job as any, selectedEval.candidate as any);
+                    forts = evalResult.fortalezas;
+                    debils = evalResult.debilidades;
+                  }
+
+                  return (
+                    <>
+                      <div className="p-5 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl border border-emerald-100 dark:border-emerald-800">
+                        <p className="text-xs font-bold text-emerald-600 mb-3 flex items-center gap-2 uppercase tracking-widest">
+                          <Star size={14} /> Fortalezas
+                        </p>
+                        <ul className="space-y-2">
+                          {forts.length > 0 ? forts.map((f, i) => (
+                            <li key={i} className="text-sm text-slate-700 dark:text-slate-300 flex items-start gap-2">
+                              <span className="text-emerald-500 mt-1">•</span> {f}
+                            </li>
+                          )) : (
+                            <li className="text-xs text-slate-400 italic">No se identificaron fortalezas destacadas.</li>
+                          )}
+                        </ul>
+                      </div>
+                      <div className="p-5 bg-amber-50 dark:bg-amber-900/20 rounded-2xl border border-amber-100 dark:border-amber-800">
+                        <p className="text-xs font-bold text-amber-600 mb-3 flex items-center gap-2 uppercase tracking-widest">
+                          <AlertTriangle size={14} /> Áreas de Mejora
+                        </p>
+                        <ul className="space-y-2">
+                          {debils.length > 0 ? debils.map((d, i) => (
+                            <li key={i} className="text-sm text-slate-700 dark:text-slate-300 flex items-start gap-2">
+                              <span className="text-amber-500 mt-1">•</span> {d}
+                            </li>
+                          )) : (
+                            <li className="text-xs text-slate-400 italic">No se identificaron debilidades críticas.</li>
+                          )}
+                        </ul>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
 
-              <button 
-                onClick={() => setSelectedEval(null)}
-                className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-2xl shadow-xl hover:opacity-90 transition-all"
-              >
-                Cerrar Análisis
-              </button>
+              <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-bold flex items-center gap-2"><Calendar size={18} /> Agendar Entrevista</h3>
+                  {selectedEval.fecha_entrevista && (
+                    <span className="text-[10px] bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-bold">
+                      Programada: {new Date(selectedEval.fecha_entrevista).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <input 
+                    type="datetime-local" 
+                    value={interviewDate}
+                    onChange={(e) => setInterviewDate(e.target.value)}
+                    className="flex-1 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm"
+                  />
+                  <button 
+                    onClick={() => updateApplication(selectedEval.id, { fecha_entrevista: interviewDate, estado: 'entrevista_pendiente' })}
+                    className="px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl text-sm hover:opacity-90"
+                  >
+                    Agendar
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => updateApplication(selectedEval.id, { estado: 'seleccionado' })}
+                  className="flex-1 py-4 bg-emerald-500 text-white font-bold rounded-2xl shadow-lg hover:bg-emerald-600 transition-all flex items-center justify-center gap-2"
+                >
+                  <CheckCircle size={20} /> SELECCIONAR
+                </button>
+                <button 
+                  onClick={() => updateApplication(selectedEval.id, { estado: 'rechazado' })}
+                  className="px-6 py-4 bg-slate-100 dark:bg-slate-800 text-slate-400 font-bold rounded-2xl hover:bg-red-50 hover:text-red-500 transition-all"
+                >
+                  <Trash2 size={20} />
+                </button>
+              </div>
             </div>
           </div>
         </div>

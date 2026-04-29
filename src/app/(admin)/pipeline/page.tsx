@@ -16,11 +16,11 @@ import {
 } from 'lucide-react';
 
 const COLUMNS = [
-  { id: 'evaluado', title: 'Evaluados', color: 'bg-blue-500', icon: <User size={16} /> },
-  { id: 'entrevista', title: 'Entrevista', color: 'bg-purple-500', icon: <MessageSquare size={16} /> },
-  { id: 'prueba', title: 'Prueba Técnica', color: 'bg-amber-500', icon: <Clock size={16} /> },
-  { id: 'contratado', title: 'Contratados', color: 'bg-emerald-500', icon: <CheckCircle2 size={16} /> },
-  { id: 'rechazado', title: 'Descartados', color: 'bg-red-500', icon: <XCircle size={16} /> },
+  { id: 'evaluados', title: 'Evaluados', color: 'bg-blue-500', icon: <User size={16} />, statusMatch: ['pendiente', 'evaluado'] },
+  { id: 'seleccionados', title: 'Seleccionados', color: 'bg-emerald-500', icon: <CheckCircle2 size={16} />, statusMatch: ['seleccionado'] },
+  { id: 'entrevista', title: 'Entrevista', color: 'bg-purple-500', icon: <MessageSquare size={16} />, statusMatch: ['entrevista_pendiente', 'entrevista_realizada'] },
+  { id: 'prueba', title: 'Prueba Técnica', color: 'bg-amber-500', icon: <Clock size={16} />, statusMatch: ['prueba_tecnica'] },
+  { id: 'descartado', title: 'Descartados', color: 'bg-red-500', icon: <XCircle size={16} />, statusMatch: ['rechazado'] },
 ];
 
 export default function PipelinePage() {
@@ -90,7 +90,7 @@ export default function PipelinePage() {
                 <div className={`w-2 h-2 rounded-full ${col.color}`}></div>
                 <h3 className="font-bold text-sm uppercase tracking-widest">{col.title}</h3>
                 <span className="text-[10px] font-black bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full text-slate-400">
-                  {filteredApps.filter(a => (a.estado || 'evaluado') === col.id).length}
+                  {filteredApps.filter(a => col.statusMatch.includes(a.estado || 'pendiente')).length}
                 </span>
               </div>
               <MoreHorizontal size={16} className="text-slate-400" />
@@ -98,7 +98,7 @@ export default function PipelinePage() {
 
             <div className="flex-1 min-h-[500px] p-3 bg-slate-100/50 dark:bg-slate-900/50 rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-800 space-y-3">
               {filteredApps
-                .filter(app => (app.estado || 'evaluado') === col.id)
+                .filter(app => col.statusMatch.includes(app.estado || 'pendiente'))
                 .map(app => (
                   <div 
                     key={app.id}
@@ -109,13 +109,15 @@ export default function PipelinePage() {
                         {Math.round(app.score)}%
                       </div>
                       <select 
-                        value={app.estado || 'evaluado'}
+                        value={app.estado || 'pendiente'}
                         onChange={(e) => updateStatus(app.id, e.target.value)}
                         className="text-[10px] font-bold bg-slate-50 dark:bg-slate-800 border-none rounded-lg py-1 px-2 outline-none focus:ring-1 focus:ring-accent cursor-pointer"
                       >
-                        {COLUMNS.map(c => (
-                          <option key={c.id} value={c.id}>{c.title}</option>
-                        ))}
+                        <option value="pendiente">Evaluado</option>
+                        <option value="seleccionado">Seleccionado</option>
+                        <option value="entrevista_pendiente">Entrevista</option>
+                        <option value="prueba_tecnica">Prueba Técnica</option>
+                        <option value="rechazado">Descartado</option>
                       </select>
                     </div>
                     

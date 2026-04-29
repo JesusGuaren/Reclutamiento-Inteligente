@@ -21,13 +21,19 @@ export default function LandingPage() {
           <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-white font-black shadow-lg shadow-accent/20">T</div>
           <span className="text-2xl font-black tracking-tighter">TesIS-AI</span>
         </div>
-        <Link href="/login" className="px-6 py-2 rounded-full border border-slate-200 dark:border-slate-800 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-          Iniciar Sesión
-        </Link>
+        <div className="flex gap-4">
+          <Link href="/jobs" className="text-sm font-bold text-slate-500 hover:text-accent transition-colors pt-2">
+            Ver Ofertas
+          </Link>
+          <Link href="/login" className="px-6 py-2 rounded-full border border-slate-200 dark:border-slate-800 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+            Iniciar Sesión
+          </Link>
+        </div>
       </nav>
 
       <main className="max-w-7xl mx-auto px-6 pt-20 pb-32">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+          {/* Columna Izquierda */}
           <div className="space-y-8 animate-in slide-in-from-left duration-700">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-accent/10 text-accent rounded-full text-xs font-black uppercase tracking-widest">
               <Sparkles size={14} /> Sistema de Reclutamiento Inteligente
@@ -39,20 +45,25 @@ export default function LandingPage() {
               Elimina el sesgo cognitivo y optimiza tus procesos de selección con un motor de evaluación determinista basado en evidencia.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/login" className="px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black text-lg shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-2 group">
-                Comenzar ahora <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+              <Link href="/jobs" className="px-8 py-4 bg-accent text-white rounded-2xl font-black text-lg shadow-2xl shadow-accent/20 hover:scale-105 transition-all flex items-center justify-center gap-2 group">
+                Explorar Empleos <ArrowRight className="group-hover:translate-x-1 transition-transform" />
               </Link>
-              <div className="flex -space-x-4 items-center pl-4">
-                {[1,2,3,4].map(i => (
-                  <div key={i} className="w-10 h-10 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 overflow-hidden shadow-sm">
-                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 10}`} alt="avatar" />
-                  </div>
-                ))}
-                <span className="pl-6 text-sm font-bold text-slate-500">+500 Evaluaciones</span>
-              </div>
+              <Link href="/login" className="px-8 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl font-black text-lg hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+                Plataforma Reclutadores
+              </Link>
+            </div>
+            
+            <div className="flex -space-x-4 items-center">
+              {[1,2,3,4].map(i => (
+                <div key={i} className="w-10 h-10 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 overflow-hidden shadow-sm">
+                  <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 10}`} alt="avatar" />
+                </div>
+              ))}
+              <span className="pl-6 text-sm font-bold text-slate-500">+500 Evaluaciones</span>
             </div>
           </div>
 
+          {/* Columna Derecha */}
           <div className="relative animate-in zoom-in duration-1000 delay-200">
             <div className="absolute -inset-4 bg-accent/20 blur-3xl rounded-full"></div>
             <div className="relative p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[3rem] shadow-2xl">
@@ -74,8 +85,8 @@ export default function LandingPage() {
                 <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
                   <Trophy className="text-yellow-500" size={32} />
                   <div>
-                    <p className="font-black">Ranking en Tiempo Real</p>
-                    <p className="text-xs text-slate-500">Visualiza el top talent de forma inmediata.</p>
+                    <p className="font-black">Selección de Talentos</p>
+                    <p className="text-xs text-slate-500">Visualiza el potencial de forma equilibrada.</p>
                   </div>
                 </div>
               </div>
@@ -90,21 +101,21 @@ export default function LandingPage() {
               <ShieldCheck size={28} />
             </div>
             <h3 className="text-xl font-bold mb-2">Privacidad de Datos</h3>
-            <p className="text-slate-500 text-sm">Aislamiento total de información mediante políticas RLS (Row Level Security).</p>
+            <p className="text-slate-500 text-sm">Aislamiento total de información mediante políticas RLS.</p>
           </div>
           <div className="p-8 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 group hover:border-accent transition-colors">
             <div className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-accent/10 group-hover:text-accent transition-colors">
               <Database size={28} />
             </div>
             <h3 className="text-xl font-bold mb-2">Infraestructura Robusta</h3>
-            <p className="text-slate-500 text-sm">Respaldado por Supabase para una gestión de datos escalable y segura.</p>
+            <p className="text-slate-500 text-sm">Respaldado por Supabase para una gestión de datos segura.</p>
           </div>
           <div className="p-8 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 group hover:border-accent transition-colors">
             <div className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-accent/10 group-hover:text-accent transition-colors">
               <ChevronRight size={28} />
             </div>
             <h3 className="text-xl font-bold mb-2">Basado en Next.js 15</h3>
-            <p className="text-slate-500 text-sm">Tecnología de última generación para una experiencia de usuario fluida.</p>
+            <p className="text-slate-500 text-sm">Tecnología de última generación para una experiencia fluida.</p>
           </div>
         </div>
       </main>

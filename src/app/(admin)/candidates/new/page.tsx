@@ -111,7 +111,10 @@ export default function NewCandidatePage() {
           candidate_id: candData.id,
           score: evaluation.score_total,
           detalle_score: evaluation.detalle,
-          justificacion: evaluation.justificacion
+          justificacion: evaluation.justificacion,
+          fortalezas: evaluation.fortalezas,
+          debilidades: evaluation.debilidades,
+          estado: 'pendiente'
         }]);
     }
 

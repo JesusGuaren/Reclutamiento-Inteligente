@@ -74,8 +74,8 @@ export default function LandingPage() {
                 <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
                   <Trophy className="text-yellow-500" size={32} />
                   <div>
-                    <p className="font-black">Ranking en Tiempo Real</p>
-                    <p className="text-xs text-slate-500">Visualiza el top talent de forma inmediata.</p>
+                    <p className="font-black">Selección de Talentos</p>
+                    <p className="text-xs text-slate-500">Visualiza el potencial de forma equilibrada.</p>
                   </div>
                 </div>
               </div>

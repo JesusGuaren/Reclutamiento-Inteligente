@@ -40,6 +40,10 @@ export interface Application {
     extras: number;
   };
   justificacion: string;
+  fortalezas?: string[];
+  debilidades?: string[];
+  estado: 'pendiente' | 'seleccionado' | 'entrevista_pendiente' | 'entrevista_realizada' | 'rechazado';
+  fecha_entrevista?: string;
   candidate?: Candidate;
   job?: Job;
   created_at?: string;

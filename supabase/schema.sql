@@ -30,6 +30,10 @@ CREATE TABLE applications (
   score FLOAT NOT NULL,
   detalle_score JSONB NOT NULL, -- { habilidades: X, experiencia: Y, educacion: Z, extras: W }
   justificacion TEXT,
+  fortalezas TEXT[],
+  debilidades TEXT[],
+  estado TEXT DEFAULT 'pendiente',
+  fecha_entrevista TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

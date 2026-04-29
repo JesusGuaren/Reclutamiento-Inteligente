@@ -17,10 +17,11 @@ export default function AuthWrapper({ children }: { children: React.ReactNode })
       const { data: { session: initialSession } } = await supabase.auth.getSession();
       setSession(initialSession);
       
-      const isPublicRoute = pathname === '/' || pathname === '/login';
+      const isPublicRoute = pathname === '/' || pathname === '/login' || pathname === '/jobs';
+      const isLandingOrLogin = pathname === '/' || pathname === '/login';
       if (!initialSession && !isPublicRoute) {
         router.push('/');
-      } else if (initialSession && isPublicRoute) {
+      } else if (initialSession && isLandingOrLogin) {
         router.push('/dashboard');
       }
       setLoading(false);
@@ -51,12 +52,5 @@ export default function AuthWrapper({ children }: { children: React.ReactNode })
     );
   }
 
-  return (
-    <>
-      {!isAuthPage && <Navbar />}
-      <main className={!isAuthPage ? 'max-w-4xl mx-auto px-4 py-8 pb-32 md:pb-12 md:pt-24' : ''}>
-        {children}
-      </main>
-    </>
-  );
+  return <>{children}</>;
 }

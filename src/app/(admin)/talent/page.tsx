@@ -130,7 +130,7 @@ export default function TalentPoolPage() {
                 href={`/ranking?search=${candidate.nombre}`} 
                 className="flex items-center gap-1 text-xs font-black text-accent hover:underline"
               >
-                Ver Ranking <ArrowUpRight size={14} />
+                Ver Selección <ArrowUpRight size={14} />
               </Link>
             </div>
           </div>
